@@ -956,6 +956,7 @@ footer {
     padding: 0.58rem 1.02rem 0.56rem;
     border-radius: 8px;
     border: 1px solid rgba(0, 224, 255, 0.3);
+    overflow: hidden;
     font-weight: 600;
     letter-spacing: 0.5px;
     box-shadow: 0 0 15px rgba(0, 224, 255, 0.1);
@@ -967,17 +968,19 @@ footer {
 }
 
 .nav-btn-premium i {
-    width: 1.08rem;
-    height: 1.08rem;
+    flex: 0 0 0.94rem;
+    width: 0.94rem;
+    height: 0.94rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.66rem;
-    border-radius: 4px;
+    font-size: 0.56rem;
+    line-height: 1;
+    border-radius: 3px;
     background: linear-gradient(140deg, rgba(0, 224, 255, 0.22), rgba(0, 224, 255, 0.08));
     border: 1px solid rgba(124, 236, 255, 0.45);
     box-shadow: 0 0 10px rgba(0, 224, 255, 0.24), inset 0 -1px 0 rgba(0, 0, 0, 0.24);
-    transform: translateY(-0.2px);
+    transform: translateY(0);
 }
 
 .nav-btn-premium:hover {
