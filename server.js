@@ -396,6 +396,29 @@ app.get('/api/public/telemetry', async (req, res) => {
     return res.status(200).json(payload);
 });
 
+// 7. Public server egress IP helper (for Luarmor whitelist setup)
+app.get('/api/public/server-ip', async (req, res) => {
+    try {
+        const response = await axios.get('https://api64.ipify.org?format=json', {
+            timeout: 8000,
+            headers: {
+                Accept: 'application/json',
+                'User-Agent': 'Flow Server IP Check'
+            }
+        });
+
+        return res.status(200).json({
+            success: true,
+            ip: response.data?.ip || null
+        });
+    } catch (error) {
+        return res.status(502).json({
+            success: false,
+            message: 'Could not resolve server IP'
+        });
+    }
+});
+
 // 7. Public Team Profiles (Discord avatar sync for About Team section)
 app.get('/api/public/team-profiles', async (req, res) => {
     const discordBotToken = getDiscordBotToken();
