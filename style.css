@@ -3464,11 +3464,11 @@ body.perf-lite .btn {
 /* --- FlowUI Ambient Background Layer --- */
 .flowui-depth {
     position: absolute;
-    width: clamp(210px, 28vw, 390px);
+    width: clamp(180px, 24vw, 320px);
     aspect-ratio: 1 / 1;
     border-radius: 30px;
     pointer-events: none;
-    opacity: 0.24;
+    opacity: 0.3;
     z-index: -1;
     background-image:
         linear-gradient(155deg, rgba(8, 20, 45, 0.3), rgba(2, 9, 23, 0.7)),
@@ -3495,15 +3495,15 @@ body.perf-lite .btn {
 }
 
 .flowui-left {
-    top: 8%;
-    left: -8%;
-    transform: perspective(1200px) rotateY(23deg) rotateX(7deg) translateZ(0);
+    top: 14%;
+    left: 4%;
+    transform: perspective(1200px) rotateY(16deg) rotateX(5deg) translateZ(0);
 }
 
 .flowui-right {
-    right: -7%;
-    bottom: 5%;
-    transform: perspective(1200px) rotateY(-20deg) rotateX(8deg) translateZ(0);
+    right: 4%;
+    bottom: 10%;
+    transform: perspective(1200px) rotateY(-16deg) rotateX(6deg) translateZ(0);
     animation-delay: 0.9s;
 }
 
@@ -3519,25 +3519,35 @@ body.perf-lite .btn {
 
 @media (max-width: 1024px) {
     .flowui-depth {
-        opacity: 0.16;
-        width: clamp(160px, 33vw, 280px);
+        opacity: 0.2;
+        width: clamp(150px, 28vw, 240px);
     }
 
     .flowui-left {
-        left: -14%;
-        top: 10%;
+        left: 3%;
+        top: 16%;
     }
 
     .flowui-right {
-        right: -14%;
-        bottom: 2%;
+        right: 3%;
+        bottom: 12%;
     }
 }
 
 @media (max-width: 768px) {
     .flowui-depth {
-        opacity: 0.12;
+        opacity: 0.14;
         filter: blur(0.2px);
+    }
+
+    .flowui-left {
+        left: 2%;
+        top: 20%;
+    }
+
+    .flowui-right {
+        right: 2%;
+        bottom: 14%;
     }
 }
 
