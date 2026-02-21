@@ -3468,10 +3468,10 @@ body.perf-lite .btn {
     aspect-ratio: 1 / 1;
     border-radius: 30px;
     pointer-events: none;
-    opacity: 0.3;
+    opacity: 0.56;
     z-index: -1;
     background-image:
-        linear-gradient(155deg, rgba(8, 20, 45, 0.3), rgba(2, 9, 23, 0.7)),
+        linear-gradient(155deg, rgba(8, 20, 45, 0.08), rgba(2, 9, 23, 0.22)),
         url("icons/flowui.png");
     background-size: cover;
     background-position: center;
@@ -3490,8 +3490,8 @@ body.perf-lite .btn {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at 24% 18%, rgba(125, 235, 255, 0.28), transparent 50%),
-        radial-gradient(circle at 75% 82%, rgba(0, 224, 255, 0.18), transparent 46%);
+        radial-gradient(circle at 24% 18%, rgba(125, 235, 255, 0.18), transparent 52%),
+        radial-gradient(circle at 75% 82%, rgba(0, 224, 255, 0.1), transparent 48%);
 }
 
 .flowui-left {
@@ -3519,7 +3519,7 @@ body.perf-lite .btn {
 
 @media (max-width: 1024px) {
     .flowui-depth {
-        opacity: 0.2;
+        opacity: 0.46;
         width: clamp(150px, 28vw, 240px);
     }
 
@@ -3536,7 +3536,7 @@ body.perf-lite .btn {
 
 @media (max-width: 768px) {
     .flowui-depth {
-        opacity: 0.14;
+        opacity: 0.36;
         filter: blur(0.2px);
     }
 
@@ -3554,7 +3554,7 @@ body.perf-lite .btn {
 @media (hover: none),
 (pointer: coarse) {
     .flowui-depth {
-        opacity: 0.1;
+        opacity: 0.3;
         animation: none;
     }
 }
