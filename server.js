@@ -1,32 +1,121 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const fs = require('fs-extra');
 const path = require('path');
 const axios = require('axios');
 const https = require('https');
+const helmet = require('helmet');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-// Bypass Node TLS Handshake bugs entirely for local Luarmor requests
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.resolve(__dirname)));
-
-app.get('/', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'index.html'));
-});
-
 const LUARMOR_API_KEY = process.env.LUARMOR_API_KEY;
 const LUARMOR_PROJECT_ID = process.env.LUARMOR_PROJECT_ID;
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = String(process.env.JWT_SECRET || '');
 const PORT = process.env.PORT || 3000;
 const DB_FILE = path.join(__dirname, 'users.json');
 const ENV_FILE = path.join(__dirname, '.env');
 const TELEMETRY_CACHE_TTL_MS = 30000;
 const TEAM_PROFILE_CACHE_TTL_MS = 120000;
+const ALLOW_INSECURE_TLS = process.env.ALLOW_INSECURE_TLS === 'true';
+const PASSWORD_HASH_ROUNDS = 10;
+const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,24}$/;
+const LICENSE_KEY_REGEX = /^[A-Za-z0-9-]{10,128}$/;
+const PASSWORD_MIN_LENGTH = 6;
+
+const declaredCorsOrigins = String(process.env.CORS_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+const defaultCorsOrigins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    `http://localhost:${PORT}`,
+    `http://127.0.0.1:${PORT}`,
+    'https://flow-website.onrender.com'
+];
+
+const allowedOrigins = new Set([...defaultCorsOrigins, ...declaredCorsOrigins]);
+
+app.disable('x-powered-by');
+app.use(compression());
+app.use(helmet({
+    contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
+            fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'],
+            imgSrc: ["'self'", 'data:', 'https://cdn.discordapp.com', 'https://media.discordapp.net', 'https://placehold.co'],
+            connectSrc: ["'self'"],
+            objectSrc: ["'none'"],
+            frameAncestors: ["'none'"],
+            baseUri: ["'self'"],
+            formAction: ["'self'"]
+        }
+    },
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.has(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error('Origin is not allowed by CORS policy'));
+    },
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: false,
+    maxAge: 600
+}));
+
+app.use(express.json({ limit: '64kb' }));
+app.use(express.urlencoded({ extended: false, limit: '64kb' }));
+
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 280,
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 25,
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
+app.use('/api', apiLimiter);
+app.use('/api/login', authLimiter);
+app.use('/api/register', authLimiter);
+
+app.use(express.static(path.resolve(__dirname), {
+    setHeaders: (res, filePath) => {
+        if (/\.(css|js)$/i.test(filePath)) {
+            res.setHeader('Cache-Control', 'public, max-age=300');
+            return;
+        }
+        if (/\.(png|jpg|jpeg|gif|webp|svg|ico)$/i.test(filePath)) {
+            res.setHeader('Cache-Control', 'public, max-age=86400');
+        }
+    }
+}));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'index.html'));
+});
+
+if (JWT_SECRET.length < 16) {
+    console.warn('JWT_SECRET is too short or missing. Set a long random secret for production.');
+}
 const TEAM_DISCORD_MEMBERS = [
     { id: '361164855623024641', name: 'Null' },
     { id: '1226751090427559966', name: 'Gensis' },
@@ -45,9 +134,27 @@ if (!fs.existsSync(DB_FILE)) {
 // Helper to interact with local DB
 const getLocalUsers = () => fs.readJsonSync(DB_FILE);
 const saveLocalUsers = (users) => fs.writeJsonSync(DB_FILE, users);
+const isJwtConfigured = () => JWT_SECRET.length >= 16;
+const normalizeUsername = (value) => String(value || '').trim();
+const normalizeLicenseKey = (value) => String(value || '').trim();
+const normalizePassword = (value) => String(value || '');
 
-// axios TLS bypass configuration for Cloudflare/Luarmor nodes
-const httpsAgent = new https.Agent({ rejectUnauthorized: false, keepAlive: false });
+const isUsernameValid = (username) => USERNAME_REGEX.test(username);
+const isLicenseKeyValid = (key) => LICENSE_KEY_REGEX.test(key);
+const isPasswordValid = (password) => password.length >= PASSWORD_MIN_LENGTH;
+
+const isBcryptHash = (value) => /^\$2[aby]\$/.test(String(value || ''));
+
+const verifyUserPassword = async (inputPassword, storedPassword) => {
+    if (!storedPassword) return false;
+    if (isBcryptHash(storedPassword)) {
+        return bcrypt.compare(inputPassword, storedPassword);
+    }
+    return inputPassword === storedPassword;
+};
+
+// TLS verification stays enabled by default. Allow override only for temporary debugging.
+const httpsAgent = new https.Agent({ rejectUnauthorized: !ALLOW_INSECURE_TLS, keepAlive: true });
 
 // Helper to make requests to Luarmor API
 const luarmorRequest = async (endpoint, data, method = 'POST') => {
@@ -173,9 +280,14 @@ const fetchDiscordUser = async (userId, botToken) => {
 
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
+    if (!isJwtConfigured()) {
+        return res.status(500).json({ success: false, message: 'Server auth is not configured.' });
+    }
+
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    if (token == null) return res.status(401).json({ success: false, message: 'No authentication token provided' });
+    const isBearer = typeof authHeader === 'string' && authHeader.startsWith('Bearer ');
+    const token = isBearer ? authHeader.slice(7).trim() : '';
+    if (!token) return res.status(401).json({ success: false, message: 'No authentication token provided' });
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) return res.status(403).json({ success: false, message: 'Invalid or expired token' });
@@ -186,30 +298,41 @@ const authenticateToken = (req, res, next) => {
 
 // 1. Register User (Creating a user in Luarmor User System)
 app.post('/api/register', async (req, res) => {
-    const { username, password, license_key } = req.body;
+    const username = normalizeUsername(req.body?.username);
+    const password = normalizePassword(req.body?.password);
+    const license_key = normalizeLicenseKey(req.body?.license_key);
 
     if (!username || !password || !license_key) {
         return res.status(400).json({ success: false, message: 'Username, password, and Luarmor License Key are required.' });
     }
 
+    if (!isUsernameValid(username)) {
+        return res.status(400).json({ success: false, message: 'Username must be 3-24 chars and use letters, numbers, or underscores.' });
+    }
+
+    if (!isPasswordValid(password)) {
+        return res.status(400).json({ success: false, message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters.` });
+    }
+
+    if (!isLicenseKeyValid(license_key)) {
+        return res.status(400).json({ success: false, message: 'License key format is invalid.' });
+    }
+
     const localUsers = getLocalUsers();
+    const lowercaseUsername = username.toLowerCase();
 
     // Check if username already exists
-    if (localUsers.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+    if (localUsers.find(u => String(u.username || '').toLowerCase() === lowercaseUsername)) {
         return res.status(400).json({ success: false, message: 'Username is already taken.' });
     }
 
     // Check if key is already registered to another account
-    if (localUsers.find(u => u.license_key === license_key)) {
+    if (localUsers.find(u => String(u.license_key || '') === license_key)) {
         return res.status(400).json({ success: false, message: 'This License Key has already been registered to an account.' });
     }
 
     // Call Luarmor API to check if key exists/is valid for this project
-    const { status, data } = await luarmorRequest(`/users?user_key=${license_key}`, null, 'GET');
-
-    console.log("LUARMOR REGISTRATION VALIDATION ===");
-    console.log("Status:", status);
-    console.log("Data:", JSON.stringify(data));
+    const { status, data } = await luarmorRequest(`/users?user_key=${encodeURIComponent(license_key)}`, null, 'GET');
 
     if (status === 403 || status === 401 || (typeof data === 'string' && data.includes('Not Authorized'))) {
         return res.status(500).json({ success: false, message: 'Luarmor firewall blocked the API request! You must whitelist this server IP address in your Luarmor Dashboard.' });
@@ -227,10 +350,12 @@ app.post('/api/register', async (req, res) => {
             return res.status(400).json({ success: false, message: 'This Luarmor License Key is banned.' });
         }
 
+        const passwordHash = await bcrypt.hash(password, PASSWORD_HASH_ROUNDS);
+
         // Register the new user locally
         localUsers.push({
             username,
-            password, // In production, this should be hashed (e.g., bcrypt)
+            password: passwordHash,
             license_key,
             created_at: new Date().toISOString()
         });
@@ -244,12 +369,30 @@ app.post('/api/register', async (req, res) => {
 
 // 2. Login User
 app.post('/api/login', async (req, res) => {
-    const { username, password } = req.body;
+    if (!isJwtConfigured()) {
+        return res.status(500).json({ success: false, message: 'Server auth is not configured.' });
+    }
+
+    const username = normalizeUsername(req.body?.username);
+    const password = normalizePassword(req.body?.password);
+    if (!username || !password) {
+        return res.status(400).json({ success: false, message: 'Username and password are required.' });
+    }
+
     const localUsers = getLocalUsers();
+    const userIndex = localUsers.findIndex((u) => String(u.username || '').toLowerCase() === username.toLowerCase());
+    if (userIndex === -1) {
+        return res.status(400).json({ success: false, message: 'Invalid credentials' });
+    }
+    const user = localUsers[userIndex];
+    const passwordOk = await verifyUserPassword(password, user.password);
 
-    const user = localUsers.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
-
-    if (user) {
+    if (passwordOk) {
+        // Backward compatibility: silently upgrade legacy plain text passwords.
+        if (!isBcryptHash(user.password)) {
+            localUsers[userIndex].password = await bcrypt.hash(password, PASSWORD_HASH_ROUNDS);
+            saveLocalUsers(localUsers);
+        }
         // Create JWT for web session
         const token = jwt.sign({ username: user.username, license_key: user.license_key }, JWT_SECRET, { expiresIn: '24h' });
         res.status(200).json({ success: true, token, user: { username: user.username } });
@@ -284,7 +427,7 @@ app.post('/api/reset_hwid', authenticateToken, async (req, res) => {
     }
 
     // Call Luarmor API to perform reset
-    const { status, data } = await luarmorRequest(`/users?user_key=${user.license_key}`, { action: 'reset_hwid' }, 'POST');
+    const { status, data } = await luarmorRequest(`/users?user_key=${encodeURIComponent(user.license_key)}`, { action: 'reset_hwid' }, 'POST');
 
     if (status === 200 && data.success === true && data.user_key) {
         // Luarmor generates a NEW key when HWID is reset via API
@@ -308,7 +451,7 @@ app.get('/api/stats', authenticateToken, async (req, res) => {
     if (!user) return res.status(404).json({ success: false, message: 'User not found in local DB' });
 
     // Call Luarmor API 
-    const { status, data } = await luarmorRequest(`/users?user_key=${user.license_key}`, null, 'GET');
+    const { status, data } = await luarmorRequest(`/users?user_key=${encodeURIComponent(user.license_key)}`, null, 'GET');
 
     if (status === 200 && data.success === true && Array.isArray(data.users) && data.users.length > 0) {
         const luarmorUser = data.users[0];
@@ -486,6 +629,21 @@ app.get('/api/public/team-profiles', async (req, res) => {
     };
 
     return res.status(200).json(payload);
+});
+
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ success: false, message: 'API endpoint not found.' });
+    }
+    return next();
+});
+
+app.use((err, req, res, next) => {
+    if (err?.message?.includes('CORS')) {
+        return res.status(403).json({ success: false, message: 'Request origin is blocked.' });
+    }
+    console.error('Unhandled server error:', err?.message || err);
+    return res.status(500).json({ success: false, message: 'Internal server error.' });
 });
 
 app.listen(PORT, () => {

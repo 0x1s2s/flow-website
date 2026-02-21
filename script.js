@@ -1,5 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const mediaMatches = (query) => {
+        if (!window.matchMedia) return false;
+        try {
+            return window.matchMedia(query).matches;
+        } catch {
+            return false;
+        }
+    };
+    const prefersReducedMotion = mediaMatches('(prefers-reduced-motion: reduce)');
+    const hasHoverPointer = mediaMatches('(hover: hover) and (pointer: fine)');
+    const isCoarsePointer = mediaMatches('(pointer: coarse)');
+    const isSmallScreen = mediaMatches('(max-width: 980px)');
+    const lowCpu = Number(navigator.hardwareConcurrency || 0) > 0 && Number(navigator.hardwareConcurrency) <= 4;
+    const lowMemory = Number(navigator.deviceMemory || 0) > 0 && Number(navigator.deviceMemory) <= 4;
+    const isLiteMode = prefersReducedMotion || isCoarsePointer || isSmallScreen || lowCpu || lowMemory;
+
+    document.body.classList.toggle('perf-lite', isLiteMode);
+
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const API_URL = isLocalhost ? 'http://localhost:3000/api' : `${window.location.origin}/api`;
 
@@ -94,22 +111,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Scroll reveal observers
-    const observerOptions = {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1
-    };
+    const revealTargets = document.querySelectorAll('.fade-in');
+    if ('IntersectionObserver' in window) {
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
 
-    const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
+        const observer = new IntersectionObserver((entries, revealObserver) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
 
-    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        revealTargets.forEach(el => observer.observe(el));
+    } else {
+        revealTargets.forEach((el) => el.classList.add('visible'));
+    }
 
     // Navbar, active section links, and progress indicator
     const navbar = document.querySelector('.navbar');
@@ -144,29 +166,31 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         };
 
-        const navObserver = new IntersectionObserver((entries) => {
-            let topEntry = null;
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    if (!topEntry || entry.intersectionRatio > topEntry.intersectionRatio) {
-                        topEntry = entry;
+        if ('IntersectionObserver' in window) {
+            const navObserver = new IntersectionObserver((entries) => {
+                let topEntry = null;
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (!topEntry || entry.intersectionRatio > topEntry.intersectionRatio) {
+                            topEntry = entry;
+                        }
                     }
+                });
+                if (topEntry?.target?.id) {
+                    setActiveNav(topEntry.target.id);
                 }
+            }, {
+                threshold: [0.3, 0.5, 0.8],
+                rootMargin: '-20% 0px -55% 0px'
             });
-            if (topEntry?.target?.id) {
-                setActiveNav(topEntry.target.id);
-            }
-        }, {
-            threshold: [0.3, 0.5, 0.8],
-            rootMargin: '-20% 0px -55% 0px'
-        });
 
-        sections.forEach(section => navObserver.observe(section));
+            sections.forEach(section => navObserver.observe(section));
+        }
     }
 
     // About Team: live Discord avatar sync with local image fallback
     const teamCards = Array.from(document.querySelectorAll('.team-card[data-discord-id]'));
-    const teamRefreshIntervalMs = 5 * 60 * 1000;
+    const teamRefreshIntervalMs = isLiteMode ? 10 * 60 * 1000 : 5 * 60 * 1000;
 
     const normalizePath = (src = '') => src.split('?')[0].replace(/^https?:\/\/[^/]+/i, '');
     const isFallbackPath = (currentSrc = '', fallbackSrc = '') => {
@@ -418,13 +442,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     fetchPublicTelemetry();
-    setInterval(fetchPublicTelemetry, 60000);
+    setInterval(fetchPublicTelemetry, isLiteMode ? 120000 : 60000);
 
     // Logo Tilt Effect (Parallax)
     const tiltLogo = document.querySelector('.flow-emblem-3d, .main-logo, .premium-f-logo');
     const logoContainer = document.querySelector('.tilt-effect');
 
-    if (tiltLogo && logoContainer) {
+    if (tiltLogo && logoContainer && hasHoverPointer && !isLiteMode) {
         logoContainer.addEventListener('mousemove', (e) => {
             const rect = logoContainer.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -445,7 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Unified tilt highlight effect for cards and CTA buttons
-    if (!prefersReducedMotion) {
+    if (!prefersReducedMotion && hasHoverPointer && !isLiteMode) {
         const tiltTargets = document.querySelectorAll('.glass-card, .premium-key-card, .game-image-card, .btn');
         tiltTargets.forEach((element) => {
             const intensity = element.classList.contains('btn') ? 6 : 12;
@@ -504,7 +528,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (authToken) {
             authModal.classList.remove('active');
             dashboardModal.classList.add('active');
-            document.getElementById('dashUsername').innerText = `Welcome, ${window.localStorage.getItem('flow_username') || 'User'}`;
+            const storedUsername = (window.localStorage.getItem('flow_username') || 'User').trim();
+            document.getElementById('dashUsername').innerText = `Welcome, ${storedUsername}`;
+            const avatarInitialEl = document.getElementById('dashAvatarInitial');
+            if (avatarInitialEl) {
+                const firstCharMatch = storedUsername.match(/[A-Za-z0-9]/);
+                avatarInitialEl.textContent = (firstCharMatch ? firstCharMatch[0] : 'U').toUpperCase();
+            }
             fetchDashboardStats();
         } else {
             dashboardModal.classList.remove('active');
@@ -670,31 +700,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- STUNNING 3D MODAL TILT EFFECT ---
     const modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
-        const maxTilt = modal.id === 'dashboardModal' ? 0 : 16;
+    if (hasHoverPointer && !isLiteMode) {
+        modals.forEach(modal => {
+            const maxTilt = modal.id === 'dashboardModal' ? 0 : 16;
 
-        modal.addEventListener('mousemove', (e) => {
-            if (!modal.classList.contains('active')) return;
-            const rect = modal.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
+            modal.addEventListener('mousemove', (e) => {
+                if (!modal.classList.contains('active')) return;
+                const rect = modal.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
 
-            const rotateX = -(y / rect.height) * maxTilt;
-            const rotateY = (x / rect.width) * maxTilt;
+                const rotateX = -(y / rect.height) * maxTilt;
+                const rotateY = (x / rect.width) * maxTilt;
 
-            modal.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1) translateY(0)`;
+                modal.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1) translateY(0)`;
+            });
+
+            modal.addEventListener('mouseleave', () => {
+                if (!modal.classList.contains('active')) return;
+                modal.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1) translateY(0)';
+                modal.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            });
+
+            modal.addEventListener('mouseenter', () => {
+                modal.style.transition = 'transform 0.1s ease';
+            });
         });
-
-        modal.addEventListener('mouseleave', () => {
-            if (!modal.classList.contains('active')) return;
-            modal.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1) translateY(0)`;
-            modal.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-        });
-
-        modal.addEventListener('mouseenter', () => {
-            modal.style.transition = 'transform 0.1s ease'; // Fast transition while hovering
-        });
-    });
+    }
 
     // --- HIGH PERFORMANCE CANVAS SNOWFALL & MOUSE PHYSICS ---
     const canvas = document.getElementById('snowfall');
@@ -703,24 +735,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
 
-    window.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        if (mouseGlow) {
-            mouseGlow.style.transform = `translate(calc(${mouseX}px - 50%), calc(${mouseY}px - 50%))`;
-        }
-        if (ambientScene && !prefersReducedMotion) {
-            const offsetX = ((mouseX / window.innerWidth) - 0.5) * 14;
-            const offsetY = ((mouseY / window.innerHeight) - 0.5) * 14;
-            ambientScene.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
-        }
-    });
+    if (!isLiteMode && hasHoverPointer) {
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            if (mouseGlow) {
+                mouseGlow.style.transform = `translate(calc(${mouseX}px - 50%), calc(${mouseY}px - 50%))`;
+            }
+            if (ambientScene && !prefersReducedMotion) {
+                const offsetX = ((mouseX / window.innerWidth) - 0.5) * 14;
+                const offsetY = ((mouseY / window.innerHeight) - 0.5) * 14;
+                ambientScene.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
+            }
+        });
+    }
 
-    if (canvas) {
+    if (canvas && !isLiteMode && !prefersReducedMotion) {
         const ctx = canvas.getContext('2d');
         let width, height;
         let particles = [];
-        const MAX_PARTICLES = prefersReducedMotion ? 70 : 150;
+        const MAX_PARTICLES = window.innerWidth < 1200 ? 90 : 130;
         const MOUSE_RADIUS = 120; // How far the snow is pushed away
         let isSnowPaused = false;
 
