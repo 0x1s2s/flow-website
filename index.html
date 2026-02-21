@@ -494,13 +494,15 @@
             <div class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></div>
 
             <div class="dashboard-header">
-                <div class="user-avatar"><span class="avatar-ring"></span><i class="fa-solid fa-user-astronaut"></i></div>
-                <div class="dashboard-user-meta">
-                    <span class="dashboard-eyebrow">Account Center</span>
-                    <h2 id="dashUsername">Welcome, User</h2>
-                    <span class="status-badge" id="dashStatusBadge"><i class="fa-solid fa-circle-check"></i> Premium
-                        Member</span>
-                    <span class="dashboard-subline">Secure control panel with live license status</span>
+                <div class="dashboard-identity">
+                    <div class="user-avatar"><span class="avatar-ring"></span><i class="fa-solid fa-user-astronaut"></i></div>
+                    <div class="dashboard-user-meta">
+                        <span class="dashboard-eyebrow">Account Center</span>
+                        <h2 id="dashUsername">Welcome, User</h2>
+                        <span class="status-badge" id="dashStatusBadge"><i class="fa-solid fa-circle-check"></i> Premium
+                            Member</span>
+                        <span class="dashboard-subline">Manage key access, loader copy, and HWID security in one place.</span>
+                    </div>
                 </div>
                 <div class="dashboard-actions">
                     <button class="logout-btn" onclick="logout()" title="Logout"><i
@@ -514,6 +516,7 @@
                     <div class="stat-details">
                         <span class="stat-label">Executions</span>
                         <h4 id="statTotalExecutions">0</h4>
+                        <span class="stat-sub">Total launches linked to your account</span>
                     </div>
                 </div>
                 <div class="stat-box stat-box-warm">
@@ -521,6 +524,7 @@
                     <div class="stat-details">
                         <span class="stat-label">HWID Cooldown</span>
                         <h4 id="statHWIDCooldown">Checking...</h4>
+                        <span class="stat-sub">Reset window and availability status</span>
                     </div>
                 </div>
             </div>
