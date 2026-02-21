@@ -734,9 +734,20 @@ footer {
     gap: 1rem;
 }
 
+.footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.08rem;
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: #d4d9e8;
+}
+
 .footer-content .logo-f {
     font-size: 2rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
 }
 
 /* Toast */
