@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow | Premium Roblox Script Hub</title>
+    <meta name="description"
+        content="Flow - The ultimate universal and game-specific script hub for Roblox. Supports 13+ games including Blox Fruits, Rivals, and more.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="scroll-progress-wrap" aria-hidden="true">
+        <div id="scrollProgress" class="scroll-progress"></div>
+    </div>
+
+    <div class="ambient-scene" aria-hidden="true">
+        <div class="scene-shape shape-a"></div>
+        <div class="scene-shape shape-b"></div>
+        <div class="scene-shape shape-c"></div>
+        <div class="scene-grid-depth"></div>
+    </div>
+
+    <!-- Premium Background Effects -->
+    <div class="mouse-glow-tracker"></div>
+    <canvas id="snowfall"
+        style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -3; pointer-events: none;"></canvas>
+
+    <!-- Background Effects -->
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+    <div class="grid-overlay"></div>
+
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">
+                <span class="logo-f">F</span>low
+            </div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#loader">Loader</a>
+                <a href="#keys">Keys</a>
+                <a href="#intel">Stats</a>
+                <a href="#team">Team</a>
+                <a href="#games">Games</a>
+                <a href="#" id="openAuthBtn" class="nav-btn-premium"><i class="fa-solid fa-user"></i> Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="hero fade-in">
+            <div class="hero-content">
+                <div class="hero-logo-container tilt-effect">
+                    <img src="https://i.imgur.com/your-f-logo.png" alt="Flow Logo" class="main-logo"
+                        onerror="this.outerHTML='<div class=\'premium-f-logo\'>F</div>'">
+                </div>
+                <h1 class="glitch-text" data-text="Experience Flow">Experience Flow</h1>
+                <p class="hero-subtitle">The apex of Roblox scripting. Universal compatibility, unparalleled
+                    performance, and premium game-specific features.</p>
+                <div class="hero-badges">
+                    <span class="badge"><i class="fa-solid fa-gamepad"></i> 13+ Dedicated Games</span>
+                    <span class="badge"><i class="fa-solid fa-globe"></i> Universal Support</span>
+                    <span class="badge"><i class="fa-solid fa-bolt"></i> Bypass & Security</span>
+                </div>
+                <div class="hero-buttons">
+                    <a href="#loader" class="btn btn-primary">Get Script <i class="fa-solid fa-code"></i></a>
+                    <a href="#games" class="btn btn-secondary">Supported Games <i
+                            class="fa-solid fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loader Section -->
+        <section id="loader" class="section fade-in">
+            <div class="section-header">
+                <h2>Free Scripts <span class="accent-text">(Key System)</span></h2>
+                <p>This loader utilizes Luarmor v4 and requires a valid key to execute.</p>
+            </div>
+
+            <div class="glass-card loader-card shine-effect">
+                <div class="card-header">
+                    <h3><i class="fa-solid fa-terminal text-cyan"></i> Loader Script</h3>
+                    <button class="copy-btn" id="copyLoaderBtn">
+                        <i class="fa-regular fa-copy"></i> Copy code
+                    </button>
+                </div>
+                <div class="code-block-container">
+                    <pre><code id="loaderCode">loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/5946add9ab91f1e04cb005346a8b1968.lua"))()</code></pre>
+                </div>
+                <div class="warning-banner">
+                    <i class="fa-solid fa-triangle-exclamation warning-icon"></i>
+                    <div class="warning-text">
+                        <strong>Security Notice</strong>
+                        <p>Do not use modified or old loaders. The official Flow loader will always be securely provided
+                            above.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key System Section -->
+        <section id="keys" class="section fade-in">
+            <div class="section-header">
+                <h2>Key System</h2>
+                <p>Acquire your access key through our trusted providers below.</p>
+            </div>
+
+            <div class="keys-container-premium">
+                <!-- Premium Dark Minimalist Cards as requested -->
+                <div onclick="copyKeyLink('https://ads.luarmor.net/get_key?for=Flow-keaXfXDMymPP')"
+                    class="premium-key-card" style="cursor: pointer;">
+                    <div class="pkc-icon-circle blue-glow">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <h3>Luarmor Key</h3>
+                    <p>Get your standard key</p>
+                    <div class="pkc-footer">
+                        <span>Copy Link</span> <i class="fa-solid fa-copy"></i>
+                    </div>
+                </div>
+
+                <div onclick="copyKeyLink('https://ads.luarmor.net/get_key?for=Lootlabs-cUGRhHSfgiun')"
+                    class="premium-key-card" style="cursor: pointer;">
+                    <div class="pkc-icon-circle cyan-glow">
+                        <i class="fa-solid fa-gem"></i>
+                    </div>
+                    <h3>Lootlabs Key</h3>
+                    <p>Alternative key source</p>
+                    <div class="pkc-footer">
+                        <span>Copy Link</span> <i class="fa-solid fa-copy"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Stats Section -->
+        <section id="intel" class="section fade-in">
+            <div class="section-header">
+                <h2>Live Luarmor Stats</h2>
+                <p>These numbers come from Luarmor and refresh automatically so users can see real traffic and usage.
+                </p>
+            </div>
+
+            <div class="intel-grid">
+                <article class="glass-card metric-command-card">
+                    <div class="metric-command-head">
+                        <h3><i class="fa-solid fa-satellite text-cyan"></i> Project Stats</h3>
+                        <span class="metric-tag">Luarmor Live Stats</span>
+                    </div>
+
+                    <div class="metric-grid">
+                        <div class="metric-tile">
+                            <span class="metric-label">Total Users</span>
+                            <strong class="metric-value count-up" id="metricTotalUsers" data-target="0"
+                                data-suffix="">0</strong>
+                        </div>
+                        <div class="metric-tile">
+                            <span class="metric-label">Monthly Executions</span>
+                            <strong class="metric-value count-up" id="metricMonthlyExecutions" data-target="0"
+                                data-suffix="">0</strong>
+                        </div>
+                        <div class="metric-tile">
+                            <span class="metric-label">Today's Traffic</span>
+                            <strong class="metric-value count-up" id="metricTodayTraffic" data-target="0"
+                                data-suffix="">0</strong>
+                        </div>
+                        <div class="metric-tile">
+                            <span class="metric-label">Threats Blocked</span>
+                            <strong class="metric-value count-up" id="metricThreatsBlocked" data-target="0"
+                                data-suffix="">0</strong>
+                        </div>
+                    </div>
+
+                    <div class="traffic-strip">
+                        <div class="traffic-strip-head">
+                            <span>30-Day Execution Trend</span>
+                            <span id="telemetryUpdatedAt">Syncing...</span>
+                        </div>
+                        <div id="trafficBars" class="traffic-bars" aria-label="Traffic trend chart"></div>
+                    </div>
+
+                    <div class="radar-core" aria-hidden="true">
+                        <span class="radar-ring ring-a"></span>
+                        <span class="radar-ring ring-b"></span>
+                        <span class="radar-dot"></span>
+                    </div>
+                </article>
+
+                <article class="glass-card pipeline-card">
+                    <h3><i class="fa-solid fa-diagram-project text-cyan"></i> Data Source</h3>
+                    <ol class="pipeline-list">
+                        <li>
+                            <h4>Luarmor API Pull</h4>
+                            <p>Stats are fetched from Luarmor using the official project stats endpoint.</p>
+                        </li>
+                        <li>
+                            <h4>Server Cache</h4>
+                            <p>Responses are cached for 30 seconds to keep requests stable and fast.</p>
+                        </li>
+                        <li>
+                            <h4>Homepage Refresh</h4>
+                            <p>Your homepage cards pull fresh values every 60 seconds.</p>
+                        </li>
+                        <li>
+                            <h4>Manual Check</h4>
+                            <p>You can compare this page with the Luarmor dashboard at any time.</p>
+                        </li>
+                    </ol>
+                </article>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section id="team" class="section fade-in">
+            <div class="section-header">
+                <h2>About The Team</h2>
+                <p>The people building and maintaining Flow.</p>
+            </div>
+
+            <div class="team-grid">
+                <article class="glass-card team-card" data-discord-id="361164855623024641">
+                    <div class="team-avatar-shell">
+                        <img class="team-avatar" src="team/null.png" data-fallback-src="team/null.png" alt="Null">
+                        <span class="team-initial">N</span>
+                    </div>
+                    <h3>Null</h3>
+                    <p class="team-role">Script Hub Dev</p>
+                </article>
+
+                <article class="glass-card team-card" data-discord-id="1226751090427559966">
+                    <div class="team-avatar-shell">
+                        <img class="team-avatar" src="team/gensis.png" data-fallback-src="team/gensis.png" alt="Gensis">
+                        <span class="team-initial">G</span>
+                    </div>
+                    <h3>Gensis</h3>
+                    <p class="team-role">Script Hub Dev</p>
+                </article>
+
+                <article class="glass-card team-card" data-discord-id="627177737358147594">
+                    <div class="team-avatar-shell">
+                        <img class="team-avatar" src="team/bezydll.png" data-fallback-src="team/bezydll.png" alt="bezydll">
+                        <span class="team-initial">B</span>
+                    </div>
+                    <h3>bezydll</h3>
+                    <p class="team-role">Flow Executor Dev</p>
+                </article>
+
+                <article class="glass-card team-card" data-discord-id="1361430335782518995">
+                    <div class="team-avatar-shell">
+                        <img class="team-avatar" src="team/vortex.png" data-fallback-src="team/vortex.png" alt="vortex">
+                        <span class="team-initial">V</span>
+                    </div>
+                    <h3>vortex</h3>
+                    <p class="team-role">UI Dev</p>
+                </article>
+
+                <article class="glass-card team-card" data-discord-id="945370152298504304">
+                    <div class="team-avatar-shell">
+                        <img class="team-avatar" src="team/saintcn2.png" data-fallback-src="team/saintcn2.png" alt="saintcn2">
+                        <span class="team-initial">S</span>
+                    </div>
+                    <h3>saintcn2</h3>
+                    <p class="team-role">Flow Manager</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- Supported Games Section -->
+        <section id="games" class="section fade-in">
+            <div class="section-header">
+                <h2>Supported Games</h2>
+                <p>Flow Universal Loader functions in <strong class="accent-text">all Roblox games</strong> providing
+                    ESP and core utilities. The games below receive highly-optimized dedicated support.</p>
+            </div>
+
+            <div class="games-wrapper">
+
+                <h3 class="subsection-title"><i class="fa-solid fa-star text-cyan"></i> Dedicated Support</h3>
+                <div class="games-grid">
+                    <!-- Game Card Template -->
+                    <div class="game-image-card hover-scale">
+                        <div class="game-image-wrapper">
+                            <img src="icons/flickshot.png" alt="Flickshot"
+                                onerror="this.src='https://placehold.co/150x150/111/00f0ff?text=FS'">
+                        </div>
+                        <div class="game-name">Flickshot</div>
+                    </div>
+
+                    <div class="game-image-card hover-scale">
+                        <div class="game-image-wrapper">
+                            <img src="icons/blade_ball.png" alt="Blade Ball"
+                                onerror="this.src='https://placehold.co/150x150/111/00f0ff?text=BB'">
+                        </div>
+                        <div class="game-name">Blade Ball</div>
+                    </div>
+
+                    <div class="game-image-card hover-scale">
+                        <div class="game-image-wrapper">
+                            <img src="icons/blox_fruits.png" alt="Blox Fruits"
+                                onerror="this.src='https://placehold.co/150x150/111/00f0ff?text=BF'">
+                        </div>
+                        <div class="game-name">Blox Fruits</div>
+                    </div>
+
+                    <div class="game-image-card hover-scale">
+                        <div class="game-image-wrapper">
+                            <img src="icons/brookhaven.png" alt="Brookhaven"
+                                onerror="this.src='https://placehold.co/150x150/111/00f0ff?text=BH'">
+                        </div>
+                        <div class="game-name">Brookhaven</div>
+                    </div>
+
+                    <div class="game-image-card hover-scale">
+                        <div class="game-image-wrapper">
+                            <img src="icons/jujutsu shaningan.png" alt="Jujutsu Shenanigans"
+                                onerror="this.src='https://placehold.co/150x150/111/00f0ff?text=JS'">
+                        </div>
+                        <div class="game-name">Jujutsu Shenanigans</div>
+                    </div>
+
+                    <div class="game-image-card hover-scale">
+                        <div class="game-image-wrapper">
+                            <img src="icons/rivals.png" alt="RIVALS"
+                                onerror="this.src='https://placehold.co/150x150/111/00f0ff?text=RV'">
+                        </div>
+                        <div class="game-name">RIVALS</div>
+                    </div>
+
+                    <div class="game-image-card hover-scale">
+                        <div class="game-image-wrapper">
+                            <img src="icons/escape waves for luckyblocks.png" alt="Escape Tsunami (Lucky Blocks)"
+                                onerror="this.src='https://placehold.co/150x150/111/00f0ff?text=ET1'">
+                        </div>
+                        <div class="game-name">Escape Tsunami: Lucky Blocks</div>
+                    </div>
+
+                    <div class="game-image-card hover-scale">
+                        <div class="game-image-wrapper">
+                            <img src="icons/escape tsunami for brainrots.png" alt="Escape Tsunami (Brainrots)"
+                                onerror="this.src='https://placehold.co/150x150/111/00f0ff?text=ET2'">
+                        </div>
+                        <div class="game-name">Escape Tsunami: Brainrots</div>
+                    </div>
+
+                    <div class="game-image-card hover-scale">
+                        <div class="game-image-wrapper">
+                            <img src="icons/scp retro.png" alt="SCP: RetroBreach"
+                                onerror="this.src='https://placehold.co/150x150/111/00f0ff?text=SCP'">
+                        </div>
+                        <div class="game-name">SCP: RetroBreach</div>
+                    </div>
+
+                    <div class="game-image-card hover-scale">
+                        <div class="game-image-wrapper">
+                            <img src="icons/99 nights.png" alt="99 Nights In The Forest"
+                                onerror="this.src='https://placehold.co/150x150/111/00f0ff?text=99N'">
+                        </div>
+                        <div class="game-name">99 Nights In The Forest</div>
+                    </div>
+
+                    <div class="game-image-card hover-scale">
+                        <div class="game-image-wrapper">
+                            <img src="icons/scary shawarma kiosak.png" alt="Scary Shawarma Kiosk"
+                                onerror="this.src='https://placehold.co/150x150/111/00f0ff?text=SSK'">
+                        </div>
+                        <div class="game-name">Scary Shawarma Kiosk</div>
+                    </div>
+                </div>
+
+                <div class="special-grids">
+                    <div class="glass-card">
+                        <h3 class="subsection-title small"><i class="fa-solid fa-fire text-orange"></i> New Support
+                            Added</h3>
+                        <div class="new-games-grid">
+                            <div class="game-image-card small-card hover-scale">
+                                <div class="game-image-wrapper">
+                                    <img src="icons/mm2.png" alt="Murder Mystery 2"
+                                        onerror="this.src='https://placehold.co/150x150/111/ff5500?text=MM2'">
+                                </div>
+                                <div class="game-name">MM2</div>
+                            </div>
+                            <div class="game-image-card small-card hover-scale">
+                                <div class="game-image-wrapper">
+                                    <img src="icons/zo samurai.png" alt="Zo Samurai"
+                                        onerror="this.src='https://placehold.co/150x150/111/ff5500?text=ZO'">
+                                </div>
+                                <div class="game-name">Zo Samurai</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card universal-card shine-effect">
+                        <h3 class="subsection-title small"><i class="fa-solid fa-globe text-cyan"></i> Universal
+                            Compatibility</h3>
+                        <p class="text-muted">Flow isn't just for these games. Our universal engine attaches to
+                            <strong>any</strong> Roblox experience.
+                        </p>
+                        <ul class="feature-list-fancy">
+                            <li><i class="fa-solid fa-check-circle"></i> Seamless injection everywhere</li>
+                            <li><i class="fa-solid fa-check-circle"></i> Automatic feature loading</li>
+                            <li><i class="fa-solid fa-check-circle"></i> Universal Player ESP</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <span class="logo-f">F</span>low Hub
+            <p>&copy; 2026 Flow Script Hub. Unparalleled Execution.</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" role="status" aria-live="polite">
+        <div class="toast-icon"><i class="fa-solid fa-check"></i></div>
+        <div class="toast-content">
+            <h4 id="toast-title">Copied!</h4>
+            <p id="toast-msg">Script copied to clipboard.</p>
+        </div>
+        <button id="toastCloseBtn" class="toast-close" type="button" aria-label="Close notification">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <!-- Modals Overlay -->
+    <div class="modal-overlay" id="modalOverlay">
+
+        <!-- Auth Modal (Login/Register) -->
+        <div class="modal auth-modal" id="authModal">
+            <div class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></div>
+
+            <div class="modal-3d-header">
+                <h1 class="flow-3d-text"><span class="flow-f">F</span>LOW</h1>
+                <p class="flow-3d-sub">Authentication Sequence</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</button>
+                <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</button>
+            </div>
+
+            <form id="authForm" class="premium-form">
+                <div class="input-group">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="username" placeholder="Username" required autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" placeholder="Password" required autocomplete="off">
+                </div>
+                <div class="input-group" id="licenseGroup" style="display: none;">
+                    <i class="fa-solid fa-key"></i>
+                    <input type="text" id="license_key" placeholder="Luarmor Key (Required)" autocomplete="off">
+                </div>
+                <button type="submit" class="btn btn-primary full-width" id="authSubmitBtn">Login</button>
+                <p id="authError" class="error-msg"></p>
+            </form>
+        </div>
+
+        <!-- Dashboard Modal (Logged In) -->
+        <div class="modal dashboard-modal" id="dashboardModal">
+            <div class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></div>
+
+            <div class="dashboard-header">
+                <div class="user-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+                <div class="dashboard-user-meta">
+                    <span class="dashboard-eyebrow">Account Center</span>
+                    <h2 id="dashUsername">Welcome, User</h2>
+                    <span class="status-badge" id="dashStatusBadge"><i class="fa-solid fa-circle-check"></i> Premium
+                        Member</span>
+                </div>
+                <div class="dashboard-actions">
+                    <button class="logout-btn" onclick="logout()" title="Logout"><i
+                            class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button>
+                </div>
+            </div>
+
+            <div class="dashboard-stats" id="dashStats">
+                <div class="stat-box stat-box-primary">
+                    <span class="stat-icon"><i class="fa-solid fa-bolt text-cyan"></i></span>
+                    <div class="stat-details">
+                        <span class="stat-label">Executions</span>
+                        <h4 id="statTotalExecutions">0</h4>
+                    </div>
+                </div>
+                <div class="stat-box stat-box-warm">
+                    <span class="stat-icon"><i class="fa-solid fa-clock-rotate-left text-orange"></i></span>
+                    <div class="stat-details">
+                        <span class="stat-label">HWID Cooldown</span>
+                        <h4 id="statHWIDCooldown">Checking...</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card redeem-card">
+                    <h3><i class="fa-solid fa-ticket"></i> Redeem License</h3>
+                    <p class="text-muted text-small">Link a new Luarmor key to your account</p>
+                    <div class="action-row">
+                        <input type="text" id="redeemKeyInput" class="premium-input" placeholder="XXXX-XXXX-XXXX-XXXX">
+                        <button class="btn btn-secondary btn-small" onclick="redeemKey()">Redeem Key</button>
+                    </div>
+                </div>
+
+                <div class="dashboard-card action-card">
+                    <h3><i class="fa-solid fa-download"></i> Get Premium Script</h3>
+                    <p class="text-muted text-small">Download your unique loader string</p>
+                    <button class="btn btn-primary full-width mt-1" onclick="getScript()"><i
+                            class="fa-solid fa-copy"></i> Copy Script</button>
+                </div>
+
+                <div class="dashboard-card action-card">
+                    <h3><i class="fa-solid fa-rotate"></i> Reset HWID</h3>
+                    <p class="text-muted text-small">Clear your linked hardware ID</p>
+                    <button class="btn btn-secondary danger-btn full-width mt-1" onclick="resetHWID()"><i
+                            class="fa-solid fa-rotate"></i> Reset Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mouse trails and dynamic effects script -->
+    <script src="script.js"></script>
+</body>
+
+</html>
