@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: flow-website
+    env: node
+    plan: free
+    autoDeploy: true
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: LUARMOR_API_KEY
+        sync: false
+      - key: LUARMOR_PROJECT_ID
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: DISCORD_BOT_TOKEN
+        sync: false
