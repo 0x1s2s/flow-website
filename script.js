@@ -269,6 +269,18 @@ document.addEventListener('DOMContentLoaded', () => {
         todayExecutions: document.getElementById('metricTodayTraffic'),
         threatsBlocked: document.getElementById('metricThreatsBlocked')
     };
+    const telemetryTrendTargets = {
+        users: document.getElementById('metricUsersTrend'),
+        monthlyExecutions: document.getElementById('metricMonthlyTrend'),
+        todayExecutions: document.getElementById('metricTodayTrend'),
+        threatsBlocked: document.getElementById('metricThreatsTrend')
+    };
+    const telemetryTiles = {
+        users: telemetryTargets.users ? telemetryTargets.users.closest('.metric-tile') : null,
+        monthlyExecutions: telemetryTargets.monthlyExecutions ? telemetryTargets.monthlyExecutions.closest('.metric-tile') : null,
+        todayExecutions: telemetryTargets.todayExecutions ? telemetryTargets.todayExecutions.closest('.metric-tile') : null,
+        threatsBlocked: telemetryTargets.threatsBlocked ? telemetryTargets.threatsBlocked.closest('.metric-tile') : null
+    };
     const trafficBars = document.getElementById('trafficBars');
     const telemetryUpdatedAt = document.getElementById('telemetryUpdatedAt');
     const compactNumberFormatter = new Intl.NumberFormat('en-US', {
@@ -309,6 +321,20 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(step);
     };
 
+    const flashMetricTile = (tile) => {
+        if (!tile) return;
+        tile.classList.remove('metric-hot');
+        void tile.offsetWidth;
+        tile.classList.add('metric-hot');
+    };
+
+    const setTrendText = (element, text, tone = 'neutral') => {
+        if (!element) return;
+        element.textContent = text;
+        element.classList.remove('trend-up', 'trend-down', 'trend-neutral');
+        element.classList.add(`trend-${tone}`);
+    };
+
     const renderTrafficBars = (series) => {
         if (!trafficBars) return;
 
@@ -321,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const maxValue = Math.max(...values, 1);
         trafficBars.innerHTML = values.map((value, index) => {
             const height = Math.max(8, Math.round((value / maxValue) * 100));
-            return `<span class="traffic-bar" style="--h:${height}%" title="Day ${index + 1}: ${value.toLocaleString()} executions"></span>`;
+            return `<span class="traffic-bar" style="--h:${height}%;--delay:${index * 45}ms" title="Day ${index + 1}: ${value.toLocaleString()} executions"></span>`;
         }).join('');
     };
 
@@ -329,18 +355,24 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!telemetryUpdatedAt) return;
         if (!isoValue) {
             telemetryUpdatedAt.textContent = isLive ? 'Updated just now' : 'Live sync unavailable';
+            telemetryUpdatedAt.classList.toggle('telemetry-live', isLive);
+            telemetryUpdatedAt.classList.toggle('telemetry-dead', !isLive);
             return;
         }
 
         const parsed = new Date(isoValue);
         if (Number.isNaN(parsed.getTime())) {
             telemetryUpdatedAt.textContent = isLive ? 'Updated just now' : 'Live sync unavailable';
+            telemetryUpdatedAt.classList.toggle('telemetry-live', isLive);
+            telemetryUpdatedAt.classList.toggle('telemetry-dead', !isLive);
             return;
         }
 
         telemetryUpdatedAt.textContent = isLive
             ? `Updated ${parsed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
             : 'Live sync unavailable';
+        telemetryUpdatedAt.classList.toggle('telemetry-live', isLive);
+        telemetryUpdatedAt.classList.toggle('telemetry-dead', !isLive);
     };
 
     const applyTelemetryPayload = (payload) => {
@@ -348,6 +380,22 @@ document.addEventListener('DOMContentLoaded', () => {
         animateCounter(telemetryTargets.monthlyExecutions, payload.monthly_executions);
         animateCounter(telemetryTargets.todayExecutions, payload.today_executions);
         animateCounter(telemetryTargets.threatsBlocked, payload.threats_blocked, (value) => `${Math.round(value || 0)}`);
+        flashMetricTile(telemetryTiles.users);
+        flashMetricTile(telemetryTiles.monthlyExecutions);
+        flashMetricTile(telemetryTiles.todayExecutions);
+        flashMetricTile(telemetryTiles.threatsBlocked);
+
+        const changePctRaw = Number(payload.daily_change_pct);
+        const changePct = Number.isFinite(changePctRaw) ? changePctRaw : 0;
+        const pctText = `${changePct > 0 ? '+' : ''}${changePct.toFixed(1)}% vs yesterday`;
+        setTrendText(telemetryTrendTargets.users, 'Audience online', 'neutral');
+        setTrendText(telemetryTrendTargets.monthlyExecutions, 'Rolling monthly total', 'neutral');
+        setTrendText(
+            telemetryTrendTargets.todayExecutions,
+            pctText,
+            changePct > 0 ? 'up' : (changePct < 0 ? 'down' : 'neutral')
+        );
+        setTrendText(telemetryTrendTargets.threatsBlocked, 'Protection engine active', 'up');
         renderTrafficBars(payload.traffic_series || []);
         setTelemetryTimestamp(payload.refreshed_at, true);
     };
@@ -365,6 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Telemetry fetch failed:', error.message);
             setTelemetryTimestamp(null, false);
+            setTrendText(telemetryTrendTargets.todayExecutions, 'Live sync unavailable', 'down');
         }
     };
 
@@ -372,7 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(fetchPublicTelemetry, 60000);
 
     // Logo Tilt Effect (Parallax)
-    const tiltLogo = document.querySelector('.main-logo');
+    const tiltLogo = document.querySelector('.flow-emblem-3d, .main-logo, .premium-f-logo');
     const logoContainer = document.querySelector('.tilt-effect');
 
     if (tiltLogo && logoContainer) {
@@ -384,14 +433,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
 
-            const rotateX = ((y - centerY) / centerY) * -15;
-            const rotateY = ((x - centerX) / centerX) * 15;
+            const rotateX = ((y - centerY) / centerY) * -11;
+            const rotateY = ((x - centerX) / centerX) * 11;
 
-            tiltLogo.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+            tiltLogo.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(12px)`;
         });
 
         logoContainer.addEventListener('mouseleave', () => {
-            tiltLogo.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+            tiltLogo.style.transform = 'perspective(1200px) rotateX(0) rotateY(0) translateZ(0)';
         });
     }
 
@@ -491,6 +540,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     statusBadge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Premium Active';
                 }
+
+                document.querySelectorAll('#dashboardModal .stat-box').forEach((box) => {
+                    box.classList.remove('stat-flash');
+                    void box.offsetWidth;
+                    box.classList.add('stat-flash');
+                });
             }
         } catch (e) {
             console.error("Failed to fetch dashboard stats", e);

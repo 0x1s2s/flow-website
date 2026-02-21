@@ -2546,3 +2546,356 @@ body::before {
         min-height: 0;
     }
 }
+
+/* --- Visual Upgrade Pass: 3D Hero + Telemetry + Account Center --- */
+.hero-logo-container {
+    margin-bottom: 1rem;
+    perspective: 1400px;
+}
+
+.flow-emblem-3d {
+    position: relative;
+    width: clamp(180px, 20vw, 240px);
+    height: clamp(180px, 20vw, 240px);
+    margin: 0 auto;
+    display: grid;
+    place-items: center;
+    transform-style: preserve-3d;
+    animation: emblemFloat 6s ease-in-out infinite alternate;
+}
+
+.flow-emblem-face,
+.flow-emblem-shadow {
+    position: absolute;
+    font-family: var(--font-heading);
+    font-size: clamp(5rem, 9vw, 8.5rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -2px;
+    user-select: none;
+}
+
+.flow-emblem-shadow {
+    color: rgba(0, 108, 137, 0.45);
+    transform: translate3d(10px, 15px, -70px) rotateX(66deg);
+    filter: blur(1px);
+}
+
+.flow-emblem-face {
+    background: linear-gradient(165deg, #f5feff 0%, #7cefff 32%, #00e0ff 70%, #00b9de 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow:
+        0 0 30px rgba(0, 224, 255, 0.55),
+        0 14px 40px rgba(0, 0, 0, 0.5);
+    transform: translateZ(24px);
+}
+
+.flow-emblem-ring {
+    position: absolute;
+    border-radius: 999px;
+    pointer-events: none;
+}
+
+.flow-emblem-ring.ring-outer {
+    inset: 5%;
+    border: 1px solid rgba(0, 224, 255, 0.28);
+    box-shadow: 0 0 35px rgba(0, 224, 255, 0.2);
+    animation: ringSpin 12s linear infinite;
+}
+
+.flow-emblem-ring.ring-inner {
+    inset: 18%;
+    border: 1px dashed rgba(122, 240, 255, 0.4);
+    animation: ringSpinReverse 7.2s linear infinite;
+}
+
+.flow-emblem-flare {
+    position: absolute;
+    inset: 14%;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 45% 40%, rgba(255, 255, 255, 0.35), rgba(0, 224, 255, 0.05) 60%, transparent 78%),
+        radial-gradient(circle at 75% 72%, rgba(0, 224, 255, 0.22), transparent 60%);
+    filter: blur(1px);
+    animation: emblemPulse 3.2s ease-in-out infinite;
+}
+
+@keyframes emblemFloat {
+    0% {
+        transform: rotateX(10deg) rotateY(-10deg) translateY(3px);
+    }
+
+    100% {
+        transform: rotateX(-7deg) rotateY(12deg) translateY(-8px);
+    }
+}
+
+@keyframes emblemPulse {
+    0%,
+    100% {
+        opacity: 0.64;
+        transform: scale(0.98);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.02);
+    }
+}
+
+@keyframes ringSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes ringSpinReverse {
+    from {
+        transform: rotate(360deg);
+    }
+
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+.metric-tile {
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-tile::before {
+    content: '';
+    position: absolute;
+    inset: -35% -30% auto auto;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 224, 255, 0.2), transparent 70%);
+    pointer-events: none;
+}
+
+.metric-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.68rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(7, 15, 28, 0.9);
+    border: 1px solid rgba(0, 224, 255, 0.28);
+    color: var(--accent-cyan);
+    margin-bottom: 0.5rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+}
+
+.metric-mini {
+    margin-top: 0.35rem;
+    font-size: 0.74rem;
+    color: #8ea2c8;
+    letter-spacing: 0.2px;
+}
+
+.metric-mini.trend-up {
+    color: #55ffbf;
+}
+
+.metric-mini.trend-down {
+    color: #ff8b8b;
+}
+
+.metric-mini.trend-neutral {
+    color: #8ea2c8;
+}
+
+.metric-tile.metric-hot {
+    animation: metricPulse 560ms ease;
+}
+
+@keyframes metricPulse {
+    0% {
+        transform: translateY(0);
+        box-shadow: 0 0 0 rgba(0, 224, 255, 0);
+    }
+
+    45% {
+        transform: translateY(-4px);
+        box-shadow: 0 0 0 1px rgba(0, 224, 255, 0.28), 0 12px 24px rgba(0, 224, 255, 0.18);
+    }
+
+    100% {
+        transform: translateY(0);
+        box-shadow: 0 0 0 rgba(0, 224, 255, 0);
+    }
+}
+
+.traffic-strip {
+    overflow: hidden;
+}
+
+.traffic-strip::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 224, 255, 0.35), transparent);
+}
+
+.traffic-strip-head #telemetryUpdatedAt.telemetry-live {
+    color: #7deeff;
+    text-shadow: 0 0 10px rgba(0, 224, 255, 0.45);
+}
+
+.traffic-strip-head #telemetryUpdatedAt.telemetry-dead {
+    color: #f3a6a6;
+}
+
+.traffic-bar {
+    animation: barRise 0.72s ease both;
+    animation-delay: var(--delay, 0ms);
+}
+
+@keyframes barRise {
+    from {
+        height: 4%;
+        opacity: 0;
+    }
+
+    to {
+        height: var(--h, 12%);
+        opacity: 1;
+    }
+}
+
+#dashboardModal.modal.dashboard-modal {
+    background:
+        radial-gradient(circle at 8% 10%, rgba(0, 224, 255, 0.14), transparent 34%),
+        radial-gradient(circle at 90% 84%, rgba(255, 149, 0, 0.12), transparent 38%),
+        linear-gradient(150deg, rgba(13, 20, 36, 0.98) 0%, rgba(7, 10, 20, 0.98) 100%) !important;
+}
+
+#dashboardModal .dashboard-header {
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 1rem 1.05rem 1.1rem;
+}
+
+#dashboardModal .user-avatar {
+    position: relative;
+    overflow: hidden;
+}
+
+#dashboardModal .user-avatar .avatar-ring {
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    border: 1px dashed rgba(0, 224, 255, 0.45);
+    animation: ringSpin 9s linear infinite;
+    opacity: 0.78;
+}
+
+#dashboardModal .dashboard-subline {
+    font-size: 0.8rem;
+    color: #8ca0c8;
+    letter-spacing: 0.2px;
+}
+
+#dashboardModal .dashboard-stats {
+    margin-top: 0.35rem;
+}
+
+#dashboardModal .stat-box {
+    position: relative;
+    overflow: hidden;
+}
+
+#dashboardModal .stat-box::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 40%), rgba(255, 255, 255, 0.12), transparent 52%);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+}
+
+#dashboardModal .stat-box:hover::after {
+    opacity: 1;
+}
+
+#dashboardModal .stat-box.stat-flash {
+    animation: statFlash 0.6s ease;
+}
+
+@keyframes statFlash {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 224, 255, 0);
+    }
+
+    40% {
+        box-shadow: 0 0 0 1px rgba(0, 224, 255, 0.34), 0 10px 24px rgba(0, 224, 255, 0.18);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 224, 255, 0);
+    }
+}
+
+#dashboardModal .dashboard-card {
+    position: relative;
+    overflow: hidden;
+}
+
+#dashboardModal .dashboard-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(140deg, rgba(0, 224, 255, 0.2), transparent 35%, transparent 70%, rgba(255, 90, 90, 0.16));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+#dashboardModal .dashboard-card:hover::before {
+    opacity: 1;
+}
+
+#dashboardModal .dashboard-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 224, 255, 0.3);
+}
+
+#dashboardModal .dashboard-card .btn.full-width {
+    letter-spacing: 0.7px;
+}
+
+@media (max-width: 900px) {
+    .flow-emblem-3d {
+        width: 180px;
+        height: 180px;
+    }
+}
+
+@media (max-width: 640px) {
+    #dashboardModal .dashboard-subline {
+        max-width: 260px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .flow-emblem-3d,
+    .flow-emblem-ring,
+    .flow-emblem-flare,
+    .metric-tile.metric-hot,
+    .traffic-bar,
+    #dashboardModal .stat-box.stat-flash {
+        animation: none !important;
+    }
+}

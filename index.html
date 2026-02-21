@@ -63,8 +63,13 @@
         <section id="home" class="hero fade-in">
             <div class="hero-content">
                 <div class="hero-logo-container tilt-effect">
-                    <img src="https://i.imgur.com/your-f-logo.png" alt="Flow Logo" class="main-logo"
-                        onerror="this.outerHTML='<div class=\'premium-f-logo\'>F</div>'">
+                    <div class="flow-emblem-3d" aria-label="Flow emblem">
+                        <span class="flow-emblem-ring ring-outer"></span>
+                        <span class="flow-emblem-ring ring-inner"></span>
+                        <span class="flow-emblem-shadow">F</span>
+                        <span class="flow-emblem-face">F</span>
+                        <span class="flow-emblem-flare"></span>
+                    </div>
                 </div>
                 <h1 class="glitch-text" data-text="Experience Flow">Experience Flow</h1>
                 <p class="hero-subtitle">The apex of Roblox scripting. Universal compatibility, unparalleled
@@ -162,24 +167,32 @@
 
                     <div class="metric-grid">
                         <div class="metric-tile">
+                            <span class="metric-icon"><i class="fa-solid fa-user-group"></i></span>
                             <span class="metric-label">Total Users</span>
                             <strong class="metric-value count-up" id="metricTotalUsers" data-target="0"
                                 data-suffix="">0</strong>
+                            <span class="metric-mini" id="metricUsersTrend">Active audience</span>
                         </div>
                         <div class="metric-tile">
+                            <span class="metric-icon"><i class="fa-solid fa-wave-square"></i></span>
                             <span class="metric-label">Monthly Executions</span>
                             <strong class="metric-value count-up" id="metricMonthlyExecutions" data-target="0"
                                 data-suffix="">0</strong>
+                            <span class="metric-mini" id="metricMonthlyTrend">Current cycle</span>
                         </div>
                         <div class="metric-tile">
+                            <span class="metric-icon"><i class="fa-solid fa-signal"></i></span>
                             <span class="metric-label">Today's Traffic</span>
                             <strong class="metric-value count-up" id="metricTodayTraffic" data-target="0"
                                 data-suffix="">0</strong>
+                            <span class="metric-mini" id="metricTodayTrend">Awaiting sync</span>
                         </div>
                         <div class="metric-tile">
+                            <span class="metric-icon"><i class="fa-solid fa-shield-halved"></i></span>
                             <span class="metric-label">Threats Blocked</span>
                             <strong class="metric-value count-up" id="metricThreatsBlocked" data-target="0"
                                 data-suffix="">0</strong>
+                            <span class="metric-mini" id="metricThreatsTrend">Security layer online</span>
                         </div>
                     </div>
 
@@ -478,12 +491,13 @@
             <div class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></div>
 
             <div class="dashboard-header">
-                <div class="user-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+                <div class="user-avatar"><span class="avatar-ring"></span><i class="fa-solid fa-user-astronaut"></i></div>
                 <div class="dashboard-user-meta">
                     <span class="dashboard-eyebrow">Account Center</span>
                     <h2 id="dashUsername">Welcome, User</h2>
                     <span class="status-badge" id="dashStatusBadge"><i class="fa-solid fa-circle-check"></i> Premium
                         Member</span>
+                    <span class="dashboard-subline">Secure control panel with live license status</span>
                 </div>
                 <div class="dashboard-actions">
                     <button class="logout-btn" onclick="logout()" title="Logout"><i
