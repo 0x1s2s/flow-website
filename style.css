@@ -3460,3 +3460,95 @@ body.perf-lite .btn {
         transform: none !important;
     }
 }
+
+/* --- FlowUI Ambient Background Layer --- */
+.flowui-depth {
+    position: absolute;
+    width: clamp(210px, 28vw, 390px);
+    aspect-ratio: 1 / 1;
+    border-radius: 30px;
+    pointer-events: none;
+    opacity: 0.24;
+    z-index: -1;
+    background-image:
+        linear-gradient(155deg, rgba(8, 20, 45, 0.3), rgba(2, 9, 23, 0.7)),
+        url("icons/flowui.png");
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(115, 219, 255, 0.28);
+    box-shadow:
+        0 30px 56px rgba(0, 0, 0, 0.5),
+        0 0 34px rgba(0, 224, 255, 0.22),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    transform-style: preserve-3d;
+    animation: flowuiDrift 18s ease-in-out infinite alternate;
+    overflow: hidden;
+}
+
+.flowui-depth::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 24% 18%, rgba(125, 235, 255, 0.28), transparent 50%),
+        radial-gradient(circle at 75% 82%, rgba(0, 224, 255, 0.18), transparent 46%);
+}
+
+.flowui-left {
+    top: 8%;
+    left: -8%;
+    transform: perspective(1200px) rotateY(23deg) rotateX(7deg) translateZ(0);
+}
+
+.flowui-right {
+    right: -7%;
+    bottom: 5%;
+    transform: perspective(1200px) rotateY(-20deg) rotateX(8deg) translateZ(0);
+    animation-delay: 0.9s;
+}
+
+@keyframes flowuiDrift {
+    0% {
+        translate: 0 0;
+    }
+
+    100% {
+        translate: 0 -14px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .flowui-depth {
+        opacity: 0.16;
+        width: clamp(160px, 33vw, 280px);
+    }
+
+    .flowui-left {
+        left: -14%;
+        top: 10%;
+    }
+
+    .flowui-right {
+        right: -14%;
+        bottom: 2%;
+    }
+}
+
+@media (max-width: 768px) {
+    .flowui-depth {
+        opacity: 0.12;
+        filter: blur(0.2px);
+    }
+}
+
+@media (hover: none),
+(pointer: coarse) {
+    .flowui-depth {
+        opacity: 0.1;
+        animation: none;
+    }
+}
+
+body.perf-lite .flowui-depth {
+    display: none !important;
+}
