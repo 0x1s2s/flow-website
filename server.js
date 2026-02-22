@@ -36,7 +36,11 @@ const defaultCorsOrigins = [
     'http://127.0.0.1:3000',
     `http://localhost:${PORT}`,
     `http://127.0.0.1:${PORT}`,
-    'https://flow-website.onrender.com'
+    'https://flow-website.onrender.com',
+    'https://flowscript.info',
+    'https://www.flowscript.info',
+    'http://flowscript.info',
+    'http://www.flowscript.info'
 ];
 
 const allowedOrigins = new Set([...defaultCorsOrigins, ...declaredCorsOrigins]);
